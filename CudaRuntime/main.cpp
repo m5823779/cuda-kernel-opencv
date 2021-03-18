@@ -5,8 +5,8 @@
 #include <opencv2/cudaimgproc.hpp>
 #include "kernel.h"
 
-#define OPENCV_MAT
-//#define OPENCV_GPUMAT
+//#define OPENCV_MAT
+#define OPENCV_GPUMAT
 
 int main()
 {
@@ -38,18 +38,16 @@ int main()
     cv::cuda::GpuMat cuda_kernel_convert_img;
     Mat dst;
 
-    //namedWindow("result", WINDOW_NORMAL);
-    //setWindowProperty("result", WND_PROP_FULLSCREEN, WINDOW_FULLSCREEN);
-
     cv::cvtColor(raw_input, cv_convert_img, COLOR_BGR2RGB);
     imshow("result", cv_convert_img);
     waitKey(0);
 
     cuda_kernel_convert_img.upload(raw_input);
+    cv::cuda::GpuMat output(cuda_kernel_convert_img.size(), cuda_kernel_convert_img.type());;
 
-    ColorBGR2RGB_GpuMat(cuda_kernel_convert_img.data, cuda_kernel_convert_img.rows, cuda_kernel_convert_img.cols, cuda_kernel_convert_img.channels());
+    ColorBGR2RGB_GpuMat(cuda_kernel_convert_img, output, cuda_kernel_convert_img.rows, cuda_kernel_convert_img.cols, cuda_kernel_convert_img.channels());
 
-    cuda_kernel_convert_img.download(dst);
+    output.download(dst);
     imshow("result", dst);
     waitKey(0);
     return 0;
